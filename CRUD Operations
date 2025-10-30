@@ -1,0 +1,59 @@
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import java.util.List;
+
+public class MainApp {
+    public static void main(String[] args) {
+        // CREATE
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = session.beginTransaction();
+
+        Student student1 = new Student("Alice", 20, "alice@example.com");
+        Student student2 = new Student("Bob", 22, "bob@example.com");
+
+        session.save(student1);
+        session.save(student2);
+
+        tx.commit();
+        session.close();
+        System.out.println("Students added successfully.");
+
+        // READ
+        session = HibernateUtil.getSessionFactory().openSession();
+        List<Student> students = session.createQuery("from Student", Student.class).list();
+        System.out.println("All Students:");
+        for (Student s : students) {
+            System.out.println(s);
+        }
+        session.close();
+
+        // UPDATE
+        session = HibernateUtil.getSessionFactory().openSession();
+        tx = session.beginTransaction();
+
+        Student s1 = session.get(Student.class, 1); // fetch student with id=1
+        if (s1 != null) {
+            s1.setEmail("alice_new@example.com");
+            session.update(s1);
+        }
+
+        tx.commit();
+        session.close();
+        System.out.println("Student updated successfully.");
+
+        // DELETE
+        session = HibernateUtil.getSessionFactory().openSession();
+        tx = session.beginTransaction();
+
+        Student s2 = session.get(Student.class, 2); // fetch student with id=2
+        if (s2 != null) {
+            session.delete(s2);
+        }
+
+        tx.commit();
+        session.close();
+        System.out.println("Student deleted successfully.");
+
+        HibernateUtil.getSessionFactory().close();
+    }
+}
